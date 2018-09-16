@@ -46,3 +46,13 @@ a,b,i,s1,s2 := true,false,3,"hello","world"
 
 ![复数](https://github.com/EmonCodingBackEnd/Go/blob/master/GoLearning/images/20180917073440.png)
 
+- |3 + 4i| = $\sqrt{3^2 + 4^2}$ = 5
+- $i^2$ = -1,$i^3$ = -i, $i^4$ = 1, ...
+
+
+
+- $e^{iφ}$ = cosφ + isinφ
+- |$e^{iφ}$| = $\sqrt{cos^2φ+sin^2φ}$ = 1
+- $e^0$ = 1, $e^{i\frac{π}{2}}$ = i
+- $e^{iπ}$ = -1, $e^{i\frac{3}{2}π}$ = -i, $e^{i2π}$ = 1
+
