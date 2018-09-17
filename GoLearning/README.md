@@ -30,7 +30,7 @@ a,b,i,s1,s2 := true,false,3,"hello","world"
 
 - `:=`方式只能在函数内使用
 
-# example02
+
 
 ## 內建变量类型
 
@@ -63,3 +63,78 @@ a,b,i,s1,s2 := true,false,3,"hello","world"
 - $e^{iπ}$ + 1 = 0
 
 ![最美公式——欧拉公式](https://github.com/EmonCodingBackEnd/Go/blob/master/GoLearning/images/20180917080325.png)
+
+
+
+## 强制类型转换
+
+- 类型转换是强制的
+
+```go
+func triangle() {
+	var a, b int = 3, 4
+	var c int
+	c = int(math.Sqrt(float64(a*a + b*b)))
+	fmt.Println(c)
+}
+```
+
+## 常量的定义
+
+```go
+func consts() {
+	const (
+		filename = "abc.txt"
+		// 如果不指定类型，可以是int或者float
+		a, b = 3, 4
+	)
+	var c int
+	c = int(math.Sqrt(a*a + b*b))
+	fmt.Println(filename, c)
+}
+```
+
+##  枚举类型
+
+- 普通枚举类型
+- 自增值枚举的类型
+
+```go
+func enums() {
+	/*const (
+		cpp    = 0
+		java   = 1
+		python = 2
+		golang = 3
+	)*/
+	
+	// iota特性1：<==使用iota数值自增==>
+	const (
+		cpp        = iota
+		_
+		java
+		python
+		golang
+		javascript
+	)
+
+	// iota特性2：b, kb, mb, gb, tb, pb
+	const (
+		b  = 1 << (10 * iota)
+		kb
+		mb
+		gb
+		tb
+		pb
+	)
+	fmt.Println(cpp, java, python, golang)
+	fmt.Println(b, kb, mb, gb, tb, pb)
+}
+```
+
+## 变量定义要点
+
+- 变量类型写在变量名后面
+- 编译器可以推测变量类型
+- 没有char，只有rune
+- 原生的支持复数类型
