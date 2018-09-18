@@ -15,8 +15,8 @@ var (
 	bbb = true
 )
 
-// 在func之外不能如下定义变量
-// bb := true
+//在func之外不能如下定义变量
+//bb := true
 
 func variableZeroValue() {
 	var a int
@@ -55,7 +55,7 @@ func triangle() {
 func consts() {
 	const (
 		filename = "abc.txt"
-		// 如果不指定类型，可以是int或者float
+		//如果不指定类型，可以是int或者float
 		a, b = 3, 4
 	)
 	var c int
@@ -64,6 +64,7 @@ func consts() {
 }
 
 func enums() {
+	//常规写法
 	/*const (
 		cpp    = 0
 		java   = 1
@@ -71,7 +72,7 @@ func enums() {
 		golang = 3
 	)*/
 
-	// iota特性1：<==使用iota数值自增==>
+	//iota特性1：<==使用iota数值自增==>
 	const (
 		cpp        = iota
 		_
@@ -81,7 +82,7 @@ func enums() {
 		javascript
 	)
 
-	// iota特性2：b, kb, mb, gb, tb, pb
+	//iota特性2：b, kb, mb, gb, tb, pb
 	const (
 		b  = 1 << (10 * iota)
 		kb

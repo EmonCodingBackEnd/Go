@@ -101,6 +101,7 @@ func consts() {
 
 ```go
 func enums() {
+    // 常规写法
 	/*const (
 		cpp    = 0
 		java   = 1
@@ -141,6 +142,135 @@ func enums() {
 
 ## 条件语句
 
-- if
-  - if的条件里面不需要括号
-  - 
+- if的条件里面不需要括号
+
+```go
+// 常规写法
+func normalIf() {
+	const filename = "example/example01/branch.go"
+	contents, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s\n", contents)
+	}
+}
+
+
+```
+
+- if的条件里面可以写变量
+
+```go
+// 特性写法
+func featureIf() {
+	const filename = "example/example01/branch.go"
+	if contents, err := ioutil.ReadFile(filename); err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("%s\n", contents)
+	}
+}
+```
+
+## switch
+
+- switch会自动break，除非使用fallthrough
+
+```go
+func normalSwitch(a, b int, op string) int {
+	var result int
+	switch op {
+	case "+":
+		result = a + b
+	case "-":
+		result = a - b
+	case "*":
+		result = a * b
+	case "/":
+		result = a / b
+	default:
+		panic("unsupported operation:" + op)
+	}
+	return result
+}
+```
+
+- switch后可以没有表达式
+
+```go
+func featureSwitch(score int) string {
+	g := ""
+	switch {
+	case score < 0 || score > 100:
+		panic(fmt.Sprintf("Wrong score: %d", score))
+	case score < 60:
+		g = "F"
+	case score < 80:
+		g = "C"
+	case score < 90:
+		g = "B"
+	case score <= 100:
+		g = "A"
+	}
+	return g
+}
+```
+
+## for
+
+- 常规写法
+
+```go
+// 常规写法
+func normalFor() {
+	sum := 0
+	for i := 1; i <= 100; i++ {
+		sum += i
+	}
+	fmt.Println(sum)
+}
+```
+
+- 省略初始条件，相当于while
+
+```go
+//省略初始条件，相当于while
+func convertToBin(n int) string {
+	result := ""
+	for ; n > 0; n /= 2 {
+		lsb := n % 2
+		result = strconv.Itoa(lsb) + result
+	}
+	return result
+}
+```
+
+- 省略初始条件和递增条件，相当于while
+
+```go
+//省略初始条件和递增条件，相当于while
+func printFile(filename string) {
+	file, err := os.Open(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+}
+```
+
+- 省略所有
+
+```go
+//省略所有条件，死循环
+func forever() {
+	for {
+		fmt.Println("abc")
+	}
+}
+```
+
