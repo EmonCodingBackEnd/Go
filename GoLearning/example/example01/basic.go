@@ -9,6 +9,7 @@ import (
 var aa = 3
 var ss = "kkk"
 
+//使用var集中定义变量
 var (
 	aaa = 3
 	sss = "kkk"

@@ -5,7 +5,7 @@
 - 使用var默认值
 
 ```go
-var a,b,c, bool
+var a,b,c bool
 ```
 
 - 使用var指定初始值
@@ -16,6 +16,15 @@ var s1,s2 string = "hello", "world"
 
 - 可放在函数内，或者直接放包内
 - 使用var集中定义变量
+
+```go
+var (
+	aaa = 3
+	sss = "kkk"
+	bbb = true
+)
+```
+
 - 让编译器自动决定类型
 
 ```go
@@ -274,3 +283,111 @@ func forever() {
 }
 ```
 
+## 函数
+
+定义：
+
+```go
+func eval(a, b int, op string) int
+```
+
+- 常规函数
+
+```go
+func normalFunc(a, b int, op string) int {
+	var result int
+	switch op {
+	case "+":
+		result = a + b
+	case "-":
+		result = a - b
+	case "*":
+		result = a * b
+	case "/":
+		result = a / b
+	default:
+		panic("unsupported operation:" + op)
+	}
+	return result
+}
+```
+
+- 函数可以返回多个值
+
+```go
+func featureFunc(a, b int) (int, int) {
+	return a / b, a % b
+}
+```
+
+- 函数可以返回指定名称的值（仅用于非常简单的函数，禁止滥用）
+
+```go
+func featureFunc2(a, b int) (q, r int) {
+	return a / b, a % b
+}
+```
+
+- 多返回值时，一般最后一个参数是error
+
+```go
+func featureFunc3(a, b int, op string) (int, error) {
+	switch op {
+	case "+":
+		return a + b, nil
+	case "-":
+		return a - b, nil
+	case "*":
+		return a * b, nil
+	case "/":
+		q, _ := featureFunc2(a, b)
+		return q, nil
+	default:
+		return 0, fmt.Errorf("unsupported operation:" + op)
+	}
+}
+// 示例调用
+func main() {
+	if result, err := featureFunc3(3, 4, "x"); err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(result)
+	}
+}
+```
+
+- 函数可以作为参考
+
+```go
+func highFeatureFunc(op func(int, int2 int) int, a, b int) int {
+	p := reflect.ValueOf(op).Pointer()
+	opName := runtime.FuncForPC(p).Name()
+	fmt.Printf("Calling function %s with args (%d, %d)\n", opName, a, b)
+	return op(a, b)
+}
+```
+
+- 没有默认参数，可选参数等，只有一个可变参数
+
+```go
+func highFeatureFunc2(numbers ...int) int {
+	s := 0
+	for i := range numbers {
+		s += numbers[i]
+	}
+	return s
+}
+```
+
+## 指针
+
+Go语言只有值传递一种方式，不存在引用传递。
+
+# example02
+
+## 数组
+
+- 数组是值类型
+- `[10]int`和`[20]int`是不同类型
+- 调用`func f(arr [10]int)`会**拷贝**数组
+- 在go语言中一般不直接使用数组的
