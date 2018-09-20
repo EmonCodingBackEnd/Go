@@ -400,6 +400,8 @@ Go语言只有值传递一种方式，不存在引用传递。
 - 每一次对slice改动，都是对arr的改动
 - slice可以向后扩展，不可以向前扩展
 - s[i]不可以超越len(s)，向后扩展不可以超越底层数组cap(s)
+- 添加元素时如果超过cap，系统会重新分配更大的底层数组
+- 由于值传递的关系，必须接收append的返回值
 
 ```go
 package main
@@ -451,5 +453,167 @@ func main() {
 	//s2=[5 6], len(s2)=2, cap(s2)=3
 	fmt.Printf("s2=%v, len(s2)=%d, cap(s2)=%d\n", s2, len(s2), cap(s2))
 
+	s3 := append(s2, 10)
+	s4 := append(s3, 11)
+	s5 := append(s4, 12)
+	//s3, s4, s5 =  [5 6 10] [5 6 10 11] [5 6 10 11 12]
+	fmt.Println("s3, s4, s5 = ", s3, s4, s5)
+	//s4 and s5再是arr的view了
+	//arr =  [0 1 2 3 4 5 6 10]
+	fmt.Println("arr = ", arr)
 }
 ```
+
+- slice的操作
+
+```go
+package main
+
+import "fmt"
+
+func printSlice(s []int) {
+	fmt.Printf("%v, len=%d, cap=%d\n", s, len(s), cap(s))
+}
+
+func main() {
+	// Zero value for slice is nil
+	var s []int
+
+	for i := 0; i < 100; i++ {
+		printSlice(s)
+		s = append(s, 2*i+1)
+	}
+	fmt.Println(s)
+
+	s1 := []int{2, 4, 6, 8}
+	//[2 4 6 8], len=4, cap=4
+	printSlice(s1)
+
+	s2 := make([]int, 16)
+	//[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0], len=16, cap=16
+	printSlice(s2)
+	s3 := make([]int, 10, 32)
+	//[0 0 0 0 0 0 0 0 0 0], len=10, cap=32
+	printSlice(s3)
+
+	copy(s2, s1)
+	//[2 4 6 8 0 0 0 0 0 0 0 0 0 0 0 0], len=16, cap=16
+	printSlice(s2)
+
+	s2 = append(s2[:3], s2[4:]...)
+	//[2 4 6 0 0 0 0 0 0 0 0 0 0 0 0], len=15, cap=16
+	printSlice(s2)
+
+	front := s2[0]
+	s2 = s2[1:]
+	//2 [4 6 0 0 0 0 0 0 0 0 0 0 0 0]
+	fmt.Println(front, s2)
+
+	tail := s2[len(s2)-1]
+	s2 = s2[:len(s2)-1]
+	//0 [4 6 0 0 0 0 0 0 0 0 0 0 0]
+	fmt.Println(tail, s2)
+}
+```
+
+## map
+
+- 创建：make(map[string]int)
+- 获取元素：m[key]
+- key不存在时，获得Value类型的初始值
+- 用value, ok:=m[key]来判断是否存在key
+- 用delete删除一个key
+- 使用range遍历key，或者遍历key,value对
+- 不保证遍历顺序，如需顺序，需手动对key排序
+- 使用len获得元素个数
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+	m := map[string]string{
+		"name":    "ccmouse",
+		"course":  "golang",
+		"site":    "imooc",
+		"quality": "notbad",
+	}
+	//map[name:ccmouse course:golang site:imooc quality:notbad]
+	fmt.Println(m)
+
+	m2 := make(map[string]int)
+	//map[]
+	fmt.Println(m2) //m2 == empty map
+
+	var m3 map[string]int
+	//map[]
+	fmt.Println(m3) // m3 == nil
+
+	for k, v := range m {
+		fmt.Println(k, v)
+	}
+	for k := range m {
+		fmt.Println(k)
+	}
+	for _, v := range m {
+		fmt.Println(v)
+	}
+
+	courseName, ok := m["course"]
+	//golang true
+	fmt.Println(courseName, ok)
+	courseName, ok = m["couse"]
+	// false
+	fmt.Println(courseName, ok)
+
+	if courseName, ok = m["cause"]; ok {
+		fmt.Println(courseName)
+	} else {
+		fmt.Println("key deso not exist")
+	}
+
+	name, ok := m["name"]
+	//ccmouse true
+	fmt.Println(name, ok)
+
+	delete(m, "name")
+	name, ok = m["name"]
+	// false
+	fmt.Println(name, ok)
+}
+```
+
+- map的key
+  - map使用哈希表，必须可以比较相等
+  - 除了slice，map，function的內建类型都可以作为key
+  - Struct类型不包含上述字段，也可以作为key
+
+## map例题
+
+寻找最长不含有重复字符的子串，比如 abcabcbb -> abc; bbbbb -> b; pwwkew -> wke
+
+- 对于每一个字母x
+  - lastOccurred[x]不存在，或者<start -> 无需操作
+  - lastOccurred[x] >= start -> 更新start
+  - 更新lastOccurred[x]，更新maxLength。
+
+```go
+func lengthOfNonRepeatingSubStr(s string) int {
+	lastOccurred := make(map[byte]int)
+	start := 0
+	maxLength := 0
+	for i, ch := range []byte(s) {
+		lastI, ok := lastOccurred[ch]
+		if ok && lastI >= start {
+			start = lastOccurred[ch] + 1
+		}
+		if i-start+1 > maxLength {
+			maxLength = i - start + 1
+		}
+		lastOccurred[ch] = i
+	}
+	return maxLength
+}
+```
+

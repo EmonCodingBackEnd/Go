@@ -47,4 +47,12 @@ func main() {
 	//s2=[5 6], len(s2)=2, cap(s2)=3
 	fmt.Printf("s2=%v, len(s2)=%d, cap(s2)=%d\n", s2, len(s2), cap(s2))
 
+	s3 := append(s2, 10)
+	s4 := append(s3, 11)
+	s5 := append(s4, 12)
+	//s3, s4, s5 =  [5 6 10] [5 6 10 11] [5 6 10 11 12]
+	fmt.Println("s3, s4, s5 = ", s3, s4, s5)
+	//s4 and s5再是arr的view了
+	//arr =  [0 1 2 3 4 5 6 10]
+	fmt.Println("arr = ", arr)
 }
