@@ -1,3 +1,5 @@
+# GoLearning学习
+
 # example01
 
 ## 定义变量
@@ -391,3 +393,63 @@ Go语言只有值传递一种方式，不存在引用传递。
 - `[10]int`和`[20]int`是不同类型
 - 调用`func f(arr [10]int)`会**拷贝**数组
 - 在go语言中一般不直接使用数组的
+
+## 切片 slice
+
+- slice本身没有数据，是对底层arr的一个view
+- 每一次对slice改动，都是对arr的改动
+- slice可以向后扩展，不可以向前扩展
+- s[i]不可以超越len(s)，向后扩展不可以超越底层数组cap(s)
+
+```go
+package main
+
+import "fmt"
+
+func updateSlice(s []int) {
+	//由于传递的是原数组的slice，会改变arr的数据
+	s[0] = 100
+}
+
+func main() {
+	arr := [...]int{0, 1, 2, 3, 4, 5, 6, 7}
+	//arr[2:6] =  [2 3 4 5]
+	fmt.Println("arr[2:6] = ", arr[2:6])
+	fmt.Println("arr[:6] = ", arr[:6])
+	fmt.Println("arr[2:] = ", arr[2:])
+	fmt.Println("arr[:] = ", arr[:])
+
+	s1 := arr[2:]
+	updateSlice(s1)
+	//[100 3 4 5 6 7]
+	fmt.Println(s1)
+
+	s2 := arr[:]
+	updateSlice(s2)
+	//[100 1 100 3 4 5 6 7]
+	fmt.Println(s2)
+	//[100 1 100 3 4 5 6 7]
+	fmt.Println(arr)
+
+	s2 = s2[:5]
+	s2 = s2[3:]
+	//[3 4]
+	fmt.Println(s2)
+
+	updateSlice(s2)
+	//[100 4]
+	fmt.Println(s2)
+	//[100 1 100 100 4 5 6 7]
+	fmt.Println(arr)
+
+	//数据复原
+	arr = [...]int{0, 1, 2, 3, 4, 5, 6, 7}
+	s1 = arr[2:6]
+	s2 = s1[3:5]
+	//s1=[2 3 4 5], len(s1)=4, cap(s1)=6
+	fmt.Printf("s1=%v, len(s1)=%d, cap(s1)=%d\n", s1, len(s1), cap(s1))
+	//s2=[5 6], len(s2)=2, cap(s2)=3
+	fmt.Printf("s2=%v, len(s2)=%d, cap(s2)=%d\n", s2, len(s2), cap(s2))
+
+}
+```
