@@ -548,7 +548,7 @@ func main() {
 
 	var m3 map[string]int
 	//map[]
-	fmt.Println(m3) // m3 == nil
+	fmt.Println(m3) //m3 == nil
 
 	for k, v := range m {
 		fmt.Println(k, v)
@@ -600,10 +600,10 @@ func main() {
 
 ```go
 func lengthOfNonRepeatingSubStr(s string) int {
-	lastOccurred := make(map[byte]int)
+	lastOccurred := make(map[rune]int)
 	start := 0
 	maxLength := 0
-	for i, ch := range []byte(s) {
+	for i, ch := range []rune(s) {
 		lastI, ok := lastOccurred[ch]
 		if ok && lastI >= start {
 			start = lastOccurred[ch] + 1
@@ -614,6 +614,168 @@ func lengthOfNonRepeatingSubStr(s string) int {
 		lastOccurred[ch] = i
 	}
 	return maxLength
+}
+```
+
+## 字符和字符串的处理
+
+- rune相当于go的char
+- 使用range遍历pos, rune对
+- 使用utf8.RuneCountInString获得字符数量
+- 使用len获得字节长度
+- 使用[]byte获得字节
+
+```go
+package main
+
+import (
+	"fmt"
+	"unicode/utf8"
+)
+
+func main() {
+	s := "Yes我爱慕课网！"
+	for _, b := range []byte(s) {
+		fmt.Printf("%X ", b)
+	}
+	fmt.Println()
+	for i, ch := range s { //ch is a rune
+		fmt.Printf("(%d %X) ", i, ch)
+	}
+	fmt.Println()
+
+	fmt.Println("Rune count:", utf8.RuneCountInString(s))
+
+	bytes := []byte(s)
+	for len(bytes) > 0 {
+		ch, size := utf8.DecodeRune(bytes)
+		bytes = bytes[size:]
+		fmt.Printf("%c ", ch)
+	}
+	fmt.Println()
+
+	for i, ch := range []rune(s) {
+		fmt.Printf("(%d %c) ", i, ch)
+	}
+	fmt.Println()
+}
+```
+
+# example03
+
+## 结构体和方法
+
+###  面向对象
+
+- go语言仅支持封装，不支持继承和多态
+- go语言没有class，只有struct
+
+### 结构的创建
+
+- 不论地址还是结构本身，一律使用`.`来访问成员
+
+- 使用自定义工厂函数
+- 注意返回了局部变量的地址
+- 结构创建在堆上还是栈上？答案是：不需要关注
+
+### 为结构定义方法
+
+- 显示定义和命名方法接收者
+- 只有使用指针才可以改变结构内容
+- `nil`指针也可以调用方法！
+
+### 值接收者VS指针接收者
+
+- 要改变内容必须使用指针接收者
+- 结构过大也考虑使用讴歌指针接收者
+- 一致性：如有指针接收者，最好都是指针接收者
+- 值接收者是go语言特有的
+- 值/指针接收者均可接收值/指针
+
+```go
+package main
+
+import "fmt"
+
+type treeNode struct {
+	value       int
+	left, right *treeNode
+}
+
+func (node treeNode) print() {
+	fmt.Print(node.value, " ")
+}
+
+func (node *treeNode) setValue(value int) {
+	if node == nil {
+		fmt.Println("Setting value to nil node. Ignored.")
+		return
+	}
+	node.value = value
+}
+
+func (node *treeNode) traverse() {
+	if node == nil {
+		return
+	}
+	node.left.traverse()
+	node.print()
+	node.right.traverse()
+}
+func createNode(value int) *treeNode {
+	return &treeNode{value: value}
+}
+
+func main() {
+	var root treeNode
+	//{0 <nil> <nil>}
+	fmt.Println(root)
+
+	root = treeNode{value: 3}
+	root.left = &treeNode{}
+	root.right = &treeNode{5, nil, nil}
+	root.right.left = new(treeNode)
+	root.left.right = createNode(2)
+
+	root.right.left.setValue(4)
+	//0 2 3 4 5
+	root.traverse()
+	fmt.Println()
+
+	//4
+	root.right.left.print()
+	fmt.Println()
+
+	root.print()
+	//3
+	fmt.Println()
+	root.setValue(100)
+
+	pRoot := &root
+	//100
+	pRoot.print()
+	fmt.Println()
+	pRoot.setValue(200)
+	//200
+	pRoot.print()
+	fmt.Println()
+
+	var ppRoot *treeNode
+	//Setting value to nil node. Ignored.
+	ppRoot.setValue(200)
+	ppRoot = &root
+	ppRoot.setValue(300)
+	//300
+	ppRoot.print()
+	fmt.Println()
+
+	nodes := []treeNode{
+		{value: 3},
+		{},
+		{6, nil, &root},
+	}
+	//[{3 <nil> <nil>} {0 <nil> <nil>} {6 <nil> 0xc0420603e0}]
+	fmt.Println(nodes)
 }
 ```
 

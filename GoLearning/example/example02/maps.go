@@ -18,7 +18,7 @@ func main() {
 
 	var m3 map[string]int
 	//map[]
-	fmt.Println(m3) // m3 == nil
+	fmt.Println(m3) //m3 == nil
 
 	for k, v := range m {
 		fmt.Println(k, v)
